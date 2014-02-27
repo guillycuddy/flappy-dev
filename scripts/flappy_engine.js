@@ -40,7 +40,6 @@
 
   var Asset = function (img, offset, gravityY) {
     this.el = img;
-    this.name = name;
     this.offsetX = (offset && offset.x) ? offset.x : 0;
     this.offsetY = (offset && offset.y) ? offset.y : 0;
     this.scopeGravityY = gravityY;
@@ -66,40 +65,32 @@
       this.y += this.velocityY;
     },
 
-    rise: function () {
-      this.velocityY = -3.5;
+    rise: function (value) {
+      this.velocityY = -value;
     },
 
-    move: function () {
+    callback: function (callback) {
+      callback.call(this);
+    },
 
-      if (this.x <= -(this.el.width)) {
-        this.x = 0 + this.el.width;
+    moveX: function (speed, loop) {
+
+      if (loop) {
+        if (this.x <= -(this.el.width)) {
+          this.x = 0 + this.el.width;
+        }
       }
 
-      this.x = this.x - 0.5;
+      this.x = this.x - speed || 0.5;
     }
 
   };
 
-  var BackgroundImg = function (img, offset) {
-    this.el = img;
-    this.offset = offset ? this.el.width : 0;
-    this.x = 0 + this.offset;
-  };
-
-  BackgroundImg.prototype.move = function () {
-
-    if (this.x <= -(this.el.width)) {
-      this.x = 0 + this.el.width;
-    }
-
-    this.x = this.x - 0.5;
-  };
-
-  win.FlappyEngine = function (container) {
+  win.FlappyEngine = function (container, options) {
 
     _game = this;
 
+    var settings = options || {};
     var requestId;
 
     var loop = function () {
@@ -116,31 +107,27 @@
     this.background = createCanvas();
     this.background.canvas.width = this.width;
     this.background.canvas.height = this.height;
+    this.foreground = createCanvas();
+    this.foreground.canvas.width = this.width;
+    this.foreground.canvas.height = this.height;
     this.game = createCanvas();
     this.game.canvas.width = this.width;
     this.game.canvas.height = this.height;
     this.paused = false;
+    this.idle = true;
     this.on = false;
     this.level = 0;
     this.assets = {};
-    this.gravityY = -0.15;
+    this.gravityY = settings.gravityY || -0.19;
 
     this.container.appendChild(this.background.canvas);
     this.container.appendChild(this.game.canvas);
-
-    // createImage('/assets/background.png').addEventListener('load', function () {
-
-    //   _game.backgroundImg = new BackgroundImg(this);
-    //   _game.backgroundImg2 = new BackgroundImg(this, true);
-    //   _game.loadedAssets = _game.loadedAssets + 1;
-
-    // });
+    this.container.appendChild(this.foreground.canvas);
 
     this.start = function () {
 
       if (!requestId) {
         loop();
-        this.on = true;
       }
 
     };
@@ -187,6 +174,11 @@
 
   FlappyEngine.prototype = {
 
+    play: function () {
+      this.idle = false;
+      this.on = true;
+    },
+
     render: function () {
 
       if (this.paused) { return; }
@@ -201,6 +193,7 @@
       this.paused = false;
       this.on = false;
       this.level = 0;
+      this.idle = true;
 
       for (var key in this.assets) {
 
@@ -210,8 +203,11 @@
 
       }
 
-      this.stop();
-      this.render();
+    },
+
+    togglePause: function () {
+
+      this.paused = !this.paused;
 
     },
 

@@ -42,7 +42,7 @@ flappyDev.clicksOnContainer(function () {
 
     // GameSate returns states for 'on', 'paused', 'level', etc.
     if (this.getGameState().on) {
-        this.assets.character.rise();
+        this.assets.character.rise(4.5);
     }
 
 });
@@ -50,15 +50,35 @@ flappyDev.clicksOnContainer(function () {
 // Hook into the game loop renderer
 flappyDev.onRender(function () {
 
-    this.assets.background.move();
-    this.assets.background2.move();
-
-    this.game.ctx.drawImage(this.assets.character.el, this.assets.character.x, this.assets.character.y);
-
+    // Animate and Draw backgrounds
+    this.assets.background.moveX(0.2, true);
+    this.assets.background2.moveX(0.2, true);
     this.background.ctx.drawImage(this.assets.background.el, this.assets.background.x, this.assets.background.y);
     this.background.ctx.drawImage(this.assets.background2.el, this.assets.background2.x,this.assets.background2.y);
 
-    flappyDev.assets.character.fall();
+    if (this.idle) {
+
+        this.game.ctx.drawImage(this.assets.character.el, this.assets.character.x, this.assets.character.y);
+
+        this.assets.character.callback(function () {
+
+            var medium = 200;
+
+            if (medium - 20 < this.y) {
+                this.velocityY += this.scopeGravityY;
+                this.y += this.velocityY;
+            } else if (medium - 20 > this.y) {
+                this.velocityY -= this.scopeGravityY;
+                this.y += this.velocityY;
+            }
+
+        });
+
+        return;
+    }
+
+    this.game.ctx.drawImage(this.assets.character.el, this.assets.character.x, this.assets.character.y);
+    this.assets.character.fall();
 
 });
 
