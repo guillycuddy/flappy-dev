@@ -73,7 +73,7 @@
       callback.call(this);
     },
 
-    moveX: function (speed, loop) {
+    moveXRTL: function (speed, loop) {
 
       if (loop) {
         if (this.x <= -(this.el.width)) {
@@ -150,7 +150,7 @@
       this.assetsLength = assets.assets.length;
 
       if (this.assetsLength === 0) {
-        throw Error('No assets available');
+        throw Error('No assets available. No assets, no game.');
       }
 
       assets.assets.forEach(function (asset) {
@@ -216,7 +216,8 @@
       return {
         paused: this.paused,
         on: this.on,
-        level: this.level
+        level: this.level,
+        idle: this.idle
       }
 
     },

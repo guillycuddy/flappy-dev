@@ -26,18 +26,9 @@ flappyDev.preLoadAssets(
 // Start the game!
 flappyDev.start();
 
-// Set custom values
-flappyDev.clicked = 0;
 
 // Flappy container click event
 // 'this' will reference to the new FlappyDev instance
-flappyDev.clicksOnContainer(function () {
-
-    this.clicked = this.clicked + 1;
-
-});
-
-// Add as many Flappy click handlers as you'd like
 flappyDev.clicksOnContainer(function () {
 
     // GameSate returns states for 'on', 'paused', 'level', etc.
@@ -45,14 +36,19 @@ flappyDev.clicksOnContainer(function () {
         this.assets.character.rise(4.5);
     }
 
+    if (this.getGameState().idle) {
+        this.play();
+    }
+
 });
 
 // Hook into the game loop renderer
+// 'this' will reference to the new FlappyDev instance
 flappyDev.onRender(function () {
 
     // Animate and Draw backgrounds
-    this.assets.background.moveX(0.2, true);
-    this.assets.background2.moveX(0.2, true);
+    this.assets.background.moveXRTL(0.2, true);
+    this.assets.background2.moveXRTL(0.2, true);
     this.background.ctx.drawImage(this.assets.background.el, this.assets.background.x, this.assets.background.y);
     this.background.ctx.drawImage(this.assets.background2.el, this.assets.background2.x,this.assets.background2.y);
 
