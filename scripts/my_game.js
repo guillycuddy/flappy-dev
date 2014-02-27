@@ -25,7 +25,9 @@
                     {name: 'background2', src:'background.png', offset: {x: 500, y: 0}},
                     {name: 'character', src:'character.png', offset: {x: 140, y: 200}},
                     {name: 'pillar', src:'pillar.png', offset: {x: 700, y: 200}},
-                    {name: 'pillar2', src:'pillar.png', offset: {x: 700, y: -320}}
+                    {name: 'pillar2', src:'pillar.png', offset: {x: 700, y: -330}},
+                    {name: 'pillar3', src:'pillar.png', offset: {x: 1000, y: 430}},
+                    {name: 'pillar4', src:'pillar.png', offset: {x: 1000, y: -100}}
                 ]
             }
         );
@@ -38,13 +40,13 @@
     // 'this' will reference to the new FlappyDev instance
     flappyDev.clicksOnContainer(function () {
 
+        if (this.getGameState().idle) {
+            this.play();
+        }
+
         // GameSate returns states for 'on', 'paused', 'level', 'idle', etc.
         if (this.getGameState().on) {
             this.assets.character.rise(4.5);
-        }
-
-        if (this.getGameState().idle) {
-            this.play();
         }
 
     });
@@ -73,6 +75,10 @@
         flappyDev.game.ctx.drawImage(flappyDev.assets.pillar.el, flappyDev.assets.pillar.x, flappyDev.assets.pillar.y);
         flappyDev.assets.pillar2.moveXRTL(2);
         flappyDev.game.ctx.drawImage(flappyDev.assets.pillar2.el, flappyDev.assets.pillar2.x, flappyDev.assets.pillar2.y);
+        flappyDev.assets.pillar3.moveXRTL(2);
+        flappyDev.game.ctx.drawImage(flappyDev.assets.pillar3.el, flappyDev.assets.pillar3.x, flappyDev.assets.pillar3.y);
+        flappyDev.assets.pillar4.moveXRTL(2);
+        flappyDev.game.ctx.drawImage(flappyDev.assets.pillar4.el, flappyDev.assets.pillar4.x, flappyDev.assets.pillar4.y);
     }
 
     function isOutOfBounds () {
@@ -86,6 +92,8 @@
 
         pArr.push(flappyDev.assets.pillar);
         pArr.push(flappyDev.assets.pillar2);
+        pArr.push(flappyDev.assets.pillar3);
+        pArr.push(flappyDev.assets.pillar4);
 
         pArr.forEach(function (p) {
             if (flappyDev.assets.character.isCollision(p.x, p.y, p.w, p.h)) {

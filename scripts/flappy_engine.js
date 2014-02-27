@@ -188,6 +188,7 @@
     play: function () {
       this.idle = false;
       this.on = true;
+      this.paused = false;
     },
 
     render: function () {
