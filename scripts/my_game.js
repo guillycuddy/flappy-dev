@@ -47,7 +47,7 @@
 
     });
 
-    // Hook into the game loop renderer
+    // Hook into the game loop
     // 'this' will reference to the new FlappyDev instance
     flappyDev.inLoop(function () {
 
@@ -60,11 +60,22 @@
 
         animateCharacter();
 
-        if (this.assets.character.isOutOfBounds(this.width, this.height)) {
-            this.reset();
-        }
+        isOutOfBounds();
+        isCollision();
 
     });
+
+    function isOutOfBounds () {
+        if (flappyDev.assets.character.isOutOfBounds(flappyDev.width, flappyDev.height)) {
+            flappyDev.reset();
+        }
+    }
+
+    function isCollision () {
+        if (flappyDev.assets.character.isCollision(10, 10, 400, 100)) {
+            console.log('colliding');
+        }
+    }
 
     function animateBackground () {
         flappyDev.assets.background.moveXRTL(0.2, true);
