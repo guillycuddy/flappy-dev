@@ -62,10 +62,8 @@
     },
 
     isCollision: function (x, y, w, h) {
-      return  (this.x <= x) && ((this.w + this.x) >= x) &&
-              (this.y <= y) && ((this.h + this.y) >= y) ||
-              (x <= this.x) && ((w + x) >= this.x) &&
-              (y <= this.y) && ((h + y) >= this.y);
+      return  (this.x + this.w >= x) && (this.x <= x + w) &&
+              (this.y + this.h >= y) && (this.y <= y + h);
     },
 
     isOutOfBounds: function (w, h) {

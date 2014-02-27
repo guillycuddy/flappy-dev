@@ -23,7 +23,9 @@
                 assets: [
                     {name: 'background', src:'background.png'},
                     {name: 'background2', src:'background.png', offset: {x: 500, y: 0}},
-                    {name: 'character', src:'character.png', offset: {x: 140, y: 200}}
+                    {name: 'character', src:'character.png', offset: {x: 140, y: 200}},
+                    {name: 'pillar', src:'pillar.png', offset: {x: 700, y: 200}},
+                    {name: 'pillar2', src:'pillar.png', offset: {x: 700, y: -320}}
                 ]
             }
         );
@@ -59,11 +61,19 @@
         }
 
         animateCharacter();
+        animatePillar();
 
         isOutOfBounds();
         isCollision();
 
     });
+
+    function animatePillar () {
+        flappyDev.assets.pillar.moveXRTL(2);
+        flappyDev.game.ctx.drawImage(flappyDev.assets.pillar.el, flappyDev.assets.pillar.x, flappyDev.assets.pillar.y);
+        flappyDev.assets.pillar2.moveXRTL(2);
+        flappyDev.game.ctx.drawImage(flappyDev.assets.pillar2.el, flappyDev.assets.pillar2.x, flappyDev.assets.pillar2.y);
+    }
 
     function isOutOfBounds () {
         if (flappyDev.assets.character.isOutOfBounds(flappyDev.width, flappyDev.height)) {
@@ -72,9 +82,16 @@
     }
 
     function isCollision () {
-        if (flappyDev.assets.character.isCollision(10, 10, 400, 100)) {
-            console.log('colliding');
-        }
+        var pArr = [];
+
+        pArr.push(flappyDev.assets.pillar);
+        pArr.push(flappyDev.assets.pillar2);
+
+        pArr.forEach(function (p) {
+            if (flappyDev.assets.character.isCollision(p.x, p.y, p.w, p.h)) {
+                flappyDev.reset();
+            }
+        });
     }
 
     function animateBackground () {
