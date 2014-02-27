@@ -65,7 +65,12 @@
       return  (this.x <= x) && ((this.w + this.x) >= x) &&
               (this.y <= y) && ((this.h + this.y) >= y) ||
               (x <= this.x) && ((w + x) >= this.x) &&
-              (y <= this.y) && ((h + y) >= this.y)
+              (y <= this.y) && ((h + y) >= this.y);
+    },
+
+    isOutOfBounds: function (w, h) {
+      return  (this.x <= 0) || (this.w + this.x >= w) ||
+              (this.y <= 0) || (this.h + this.y >= h);
     },
 
     fall: function () {

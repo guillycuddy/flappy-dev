@@ -60,6 +60,10 @@
 
         animateCharacter();
 
+        if (this.assets.character.isOutOfBounds(this.width, this.height)) {
+            this.reset();
+        }
+
     });
 
     function animateBackground () {
