@@ -1,5 +1,8 @@
-// Author: @robertpiira
-// Home: github.com/robertpiira/flappyDev
+
+// Flappy Engine
+// Author:  @robertpiira
+// Home:    github.com/robertpiira/flappyDev
+// Thanks:  Johan G for the gravity
 
 
 (function (win, doc, undefined) {
@@ -44,12 +47,10 @@
     this.offsetY = (offset && offset.y) ? offset.y : 0;
     this.scopeGravityY = gravityY;
     this.velocityY = 0;
-
     this.w = img.width;
     this.h = img.height;
     this.x = 0 + this.offsetX;
     this.y = 0 + this.offsetY;
-
   };
 
   Asset.prototype  = {
@@ -184,7 +185,7 @@
       if (this.paused) { return; }
 
       this.clearCanvas();
-      this.onRender();
+      this.inLoop();
 
     },
 
@@ -234,12 +235,12 @@
 
     },
 
-    onRender: function (callback) {
+    inLoop: function (callback) {
 
-      this.onRenderCallback = this.onRenderCallback || callback;
+      this.inLoopCallback = this.inLoopCallback || callback;
 
       if (!callback) {
-        this.onRenderCallback.call(this);
+        this.inLoopCallback.call(this);
       }
 
     },

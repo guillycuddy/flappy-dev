@@ -1,11 +1,13 @@
 
 body {
-    background: brown;
+    width: 500px;
+    margin: 20px auto;
+    background: #eee;
 }
 
 
 #FlappyDevGame {
     width: 500px;
     height: 500px;
-    border: 1px solid black;
+    background: #fff;
 }
