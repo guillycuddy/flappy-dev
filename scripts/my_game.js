@@ -13,7 +13,7 @@
     var container = document.getElementById('FlappyDevGame');
 
     // Initialize a new FlappyEngine game within the game container
-    var flappyDev = new FlappyEngine(container);
+    window.flappyDev = new FlappyEngine(container);
 
     // PreLoadAssets
     // ...and set options for them

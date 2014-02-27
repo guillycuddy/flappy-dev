@@ -61,6 +61,13 @@
       this.velocityY = 0;
     },
 
+    isCollision: function (x, y, w, h) {
+      return  (this.x <= x) && ((this.w + this.x) >= x) &&
+              (this.y <= y) && ((this.h + this.y) >= y) ||
+              (x <= this.x) && ((w + x) >= this.x) &&
+              (y <= this.y) && ((h + y) >= this.y)
+    },
+
     fall: function () {
       this.velocityY -= this.scopeGravityY;
       this.y += this.velocityY;
