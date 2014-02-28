@@ -4,6 +4,9 @@
 // Home:    github.com/robertpiira/flappyDev
 // Thanks:  Johan G for the gravity
 
+window.addEventListener('load', function() {
+    FastClick.attach(document.body);
+}, false);
 
 // This is where we create a new FlappyEngine Instance
 // and start using the FlappyEngine game API
@@ -103,8 +106,8 @@
     }
 
     function animateBackground () {
-        flappyDev.assets.background.moveXRTL(0.2, true);
-        flappyDev.assets.background2.moveXRTL(0.2, true);
+        flappyDev.assets.background.moveXRTL(0.4, true);
+        flappyDev.assets.background2.moveXRTL(0.4, true);
         flappyDev.background.ctx.drawImage(flappyDev.assets.background.el, flappyDev.assets.background.x, flappyDev.assets.background.y);
         flappyDev.background.ctx.drawImage(flappyDev.assets.background2.el, flappyDev.assets.background2.x, flappyDev.assets.background2.y);
 

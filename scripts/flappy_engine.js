@@ -87,8 +87,8 @@
     moveXRTL: function (speed, loop) {
 
       if (loop) {
-        if (this.x <= -(this.el.width)) {
-          this.x = 0 + this.el.width;
+        if (this.x <= -(this.w)) {
+          this.x = 0 + this.w;
         }
       }
 
@@ -173,7 +173,7 @@
             _game.assets[asset.name] = new Asset(this, asset.offset, _game.gravityY);
             _game.loadedAssets = _game.loadedAssets + 1;
 
-          });
+          }, false);
 
         })(asset);
 
@@ -242,7 +242,7 @@
           callback.call(_game);
         }
 
-      });
+      }, false);
 
     },
 
