@@ -4,6 +4,8 @@
 // Home:    github.com/robertpiira/flappyDev
 // Thanks:  Johan G for the gravity
 
+
+// Optional use of FastClickJS for touchScreen betterness
 window.addEventListener('load', function() {
     FastClick.attach(document.body);
 }, false);
@@ -15,29 +17,60 @@ window.addEventListener('load', function() {
     // Get the game container DOM element
     var container = document.getElementById('FlappyDevGame');
 
-    // Initialize a new FlappyEngine game within the game container
-    window.flappyDev = new FlappyEngine(container);
+    // Game settings
+    var settings = {
+        gravityY: -0.19
+    }
 
-    // PreLoadAssets
-    // ...and set options for them
-    flappyDev.preLoadAssets(
+    // Initialize a new FlappyEngine game within the game container
+    window.flappyDev = new FlappyEngine(container, settings);
+
+    // Load some assets
+    flappyDev.loadAssets(
             {
-                root: 'assets',
+                collectionName: 'pillars',
                 assets: [
-                    {name: 'background', src:'background.png'},
-                    {name: 'background2', src:'background.png', offset: {x: 500, y: 0}},
-                    {name: 'character', src:'character.png', offset: {x: 140, y: 200}},
-                    {name: 'pillar', src:'pillar.png', offset: {x: 700, y: 200}},
-                    {name: 'pillar2', src:'pillar.png', offset: {x: 700, y: -330}},
-                    {name: 'pillar3', src:'pillar.png', offset: {x: 1000, y: 430}},
-                    {name: 'pillar4', src:'pillar.png', offset: {x: 1000, y: -100}}
+                    {src:'/assets/pillar.png', offset: {x: 700, y: 200}}
+                ],
+                amount: 20
+            }
+        );
+
+    flappyDev.loadAssets(
+            {
+                collectionName: 'background',
+                assets: [
+                    {src:'/assets/background.png'},
+                ],
+                amount: 2
+            }
+        );
+
+    flappyDev.loadAssets(
+            {
+                assets: [
+                    {name: 'character', src:'/assets/character.png', offset: {x: 140, y: 200}}
                 ]
             }
         );
 
-    // Start the game!
-    flappyDev.start();
 
+
+    // The games load event
+    // Here we can do some further work
+    // that needs to be done once
+    // assets are loaded etc.
+    flappyDev.onLoad(function () {
+
+        // set the static offset
+        flappyDev.assets.background[1].offsetX = 500;
+        // set the dynamic offset
+        flappyDev.assets.background[1].x = 500;
+
+    });
+
+    // Now we can start the game!
+    flappyDev.start();
 
     // Flappy container click event
     // 'this' will reference to the new FlappyDev instance
@@ -74,14 +107,18 @@ window.addEventListener('load', function() {
     });
 
     function animatePillar () {
-        flappyDev.assets.pillar.moveXRTL(2);
-        flappyDev.game.ctx.drawImage(flappyDev.assets.pillar.el, flappyDev.assets.pillar.x, flappyDev.assets.pillar.y);
-        flappyDev.assets.pillar2.moveXRTL(2);
-        flappyDev.game.ctx.drawImage(flappyDev.assets.pillar2.el, flappyDev.assets.pillar2.x, flappyDev.assets.pillar2.y);
-        flappyDev.assets.pillar3.moveXRTL(2);
-        flappyDev.game.ctx.drawImage(flappyDev.assets.pillar3.el, flappyDev.assets.pillar3.x, flappyDev.assets.pillar3.y);
-        flappyDev.assets.pillar4.moveXRTL(2);
-        flappyDev.game.ctx.drawImage(flappyDev.assets.pillar4.el, flappyDev.assets.pillar4.x, flappyDev.assets.pillar4.y);
+
+        flappyDev.assets.pillars.forEach(function (pillar) {
+
+            pillar.move(2).left();
+            flappyDev.game.ctx.drawImage(pillar.el, pillar.x, pillar.y);
+
+            if (pillar.hasPassed(0)) {
+                pillar.x = 600;
+            }
+
+        });
+
     }
 
     function isOutOfBounds () {
@@ -91,14 +128,9 @@ window.addEventListener('load', function() {
     }
 
     function isCollision () {
-        var pArr = [];
 
-        pArr.push(flappyDev.assets.pillar);
-        pArr.push(flappyDev.assets.pillar2);
-        pArr.push(flappyDev.assets.pillar3);
-        pArr.push(flappyDev.assets.pillar4);
 
-        pArr.forEach(function (p) {
+        flappyDev.assets.pillars.forEach(function (p) {
             if (flappyDev.assets.character.isCollision(p.x, p.y, p.w, p.h)) {
                 flappyDev.reset();
             }
@@ -106,10 +138,17 @@ window.addEventListener('load', function() {
     }
 
     function animateBackground () {
-        flappyDev.assets.background.moveXRTL(0.4, true);
-        flappyDev.assets.background2.moveXRTL(0.4, true);
-        flappyDev.background.ctx.drawImage(flappyDev.assets.background.el, flappyDev.assets.background.x, flappyDev.assets.background.y);
-        flappyDev.background.ctx.drawImage(flappyDev.assets.background2.el, flappyDev.assets.background2.x, flappyDev.assets.background2.y);
+
+        flappyDev.assets.background.forEach(function (background) {
+
+            background.move(0.6).left();
+            flappyDev.background.ctx.drawImage(background.el, background.x, background.y);
+
+            if (background.hasPassed(0)) {
+                background.x = background.w -2;
+            }
+
+        });
 
     }
 

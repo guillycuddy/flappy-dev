@@ -21,6 +21,8 @@
   })();
 
   var _game;
+  var evt = doc.createEvent('Event');
+  evt.initEvent('gameIsOn', true, true);
 
   var createCanvas = function () {
     var canvasEl = doc.createElement('canvas');
@@ -41,16 +43,21 @@
     return img;
   };
 
-  var Asset = function (img, offset, gravityY) {
+  var Asset = function (context, asset, img) {
     this.el = img;
-    this.offsetX = (offset && offset.x) ? offset.x : 0;
-    this.offsetY = (offset && offset.y) ? offset.y : 0;
-    this.scopeGravityY = gravityY;
+    this.offsetX = (asset.offset && asset.offset.x) ? asset.offset.x : 0;
+    this.offsetY = (asset.offset && asset.offset.y) ? asset.offset.y : 0;
+    this.scopeGravityY = context.gravityY;
     this.velocityY = 0;
     this.w = img.width;
     this.h = img.height;
     this.x = 0 + this.offsetX;
     this.y = 0 + this.offsetY;
+    this.inView = false;
+
+    this.context = context;
+    this.contextW = context.width
+    this.contextH = context.height;
   };
 
   Asset.prototype  = {
@@ -71,6 +78,12 @@
               (this.y <= 0) || (this.h + this.y >= h);
     },
 
+    isInView: function () {
+      // hardcoded canvas size variables
+      return  (this.x < 500) && (this.x + this.w > 0) &&
+              (this.y < 500) && (this.y + this.h > 0)
+    },
+
     fall: function () {
       this.velocityY -= this.scopeGravityY;
       this.y += this.velocityY;
@@ -84,15 +97,21 @@
       callback.call(this);
     },
 
-    moveXRTL: function (speed, loop) {
+    hasPassed: function (coord) {
+      return  (this.x + this.w < coord);
+    },
 
-      if (loop) {
-        if (this.x <= -(this.w)) {
-          this.x = 0 + this.w;
-        }
-      }
+    move: function (speed) {
 
-      this.x = this.x - speed || 0.5;
+      var _this = this;
+
+      return {
+        left:   function () { _this.x = _this.x - speed || - 0.5; },
+        right:  function () { _this.x = _this.x + speed || - 0.5; },
+        up:     function () { _this.y = _this.y - speed || - 0.5; },
+        down:   function () { _this.y = _this.y + speed || - 0.5; }
+      };
+
     }
 
   };
@@ -105,10 +124,13 @@
     var requestId;
 
     var loop = function () {
+
       requestId = win.requestAnimFrame(loop);
-      if (_game.loadedAssets && _game.loadedAssets === _game.assetsLength) {
+
+      if (_game.loadedAssets === _game.assetsLength) {
         _game.render();
       }
+
     };
 
     this.container = container;
@@ -130,6 +152,8 @@
     this.level = 0;
     this.assets = {};
     this.gravityY = settings.gravityY || -0.19;
+    this.loadedAssets = 0;
+    this.assetsLength = 0;
 
     this.container.appendChild(this.background.canvas);
     this.container.appendChild(this.game.canvas);
@@ -153,31 +177,62 @@
 
     };
 
-    this.preLoadAssets = function (assets) {
+    this.loadAssets = function (a) {
 
-      var assetsRoot = assets.root || 'assets';
+      var assetImg;
+      var collection;
 
-      this.loadedAssets = 0;
-      this.assetsLength = assets.assets.length;
-
-      if (this.assetsLength === 0) {
-        throw Error('No assets available. No assets, no game.');
+      if (a.collectionName && !_game.assets[a.collectionName]) {
+        collection = _game.assets[a.collectionName] = [];
       }
 
-      assets.assets.forEach(function (asset) {
+      this.assetsLength = this.assetsLength + a.assets.length;
 
-        (function (asset) {
+      a.assets.forEach(function (asset) {
 
-          createImage(assetsRoot + '/' + asset.src).addEventListener('load', function () {
+        (function (b) {
 
-            _game.assets[asset.name] = new Asset(this, asset.offset, _game.gravityY);
+          createImage(b.src).addEventListener('load', function () {
+
+            assetImg = this;
+
+            if (collection) {
+
+              if (a.amount) {
+                for (var i = 0; i < a.amount; i++) {
+                  collection.push(new Asset(_game, b, assetImg));
+                }
+              }
+
+              else {
+                collection.push(new Asset(_game, b, assetImg));
+              }
+
+            }
+
+            else if (b.name) {
+              _game.assets[b.name] = new Asset(_game, b, assetImg);
+            }
+
             _game.loadedAssets = _game.loadedAssets + 1;
+
+            if (_game.loadedAssets === _game.assetsLength) {
+              doc.dispatchEvent(evt);
+            }
 
           }, false);
 
         })(asset);
 
       });
+
+    };
+
+    this.onLoad = function (callback) {
+
+      doc.addEventListener('gameIsOn', function () {
+        callback.call(_game);
+      }, false);
 
     };
 
@@ -210,7 +265,19 @@
       for (var key in this.assets) {
 
         if (this.assets.hasOwnProperty(key)) {
-          this.assets[key].reset();
+
+          if (this.assets[key].length) {
+
+            this.assets[key].forEach(function (asset) {
+              asset.reset();
+            });
+
+          }
+
+          else {
+            this.assets[key].reset();
+          }
+
         }
 
       }
