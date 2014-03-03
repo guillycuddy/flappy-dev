@@ -49,6 +49,7 @@
     this.offsetY = (asset.offset && asset.offset.y) ? asset.offset.y : 0;
     this.scopeGravityY = context.gravityY;
     this.velocityY = 0;
+    this.velocityX = 0;
     this.w = img.width;
     this.h = img.height;
     this.x = 0 + this.offsetX;
@@ -127,9 +128,7 @@
 
       requestId = win.requestAnimFrame(loop);
 
-      if (_game.loadedAssets === _game.assetsLength) {
-        _game.render();
-      }
+        _game.loop();
 
     };
 
@@ -137,12 +136,6 @@
     this.container.style.position = 'relative';
     this.width = container.getBoundingClientRect().width;
     this.height = container.getBoundingClientRect().height;
-    this.background = createCanvas();
-    this.background.canvas.width = this.width;
-    this.background.canvas.height = this.height;
-    this.foreground = createCanvas();
-    this.foreground.canvas.width = this.width;
-    this.foreground.canvas.height = this.height;
     this.game = createCanvas();
     this.game.canvas.width = this.width;
     this.game.canvas.height = this.height;
@@ -154,10 +147,9 @@
     this.gravityY = settings.gravityY || -0.19;
     this.loadedAssets = 0;
     this.assetsLength = 0;
+    this.allAssets = [];
 
-    this.container.appendChild(this.background.canvas);
     this.container.appendChild(this.game.canvas);
-    this.container.appendChild(this.foreground.canvas);
 
     this.start = function () {
 
@@ -179,6 +171,7 @@
 
     this.loadAssets = function (a) {
 
+      var asset;
       var assetImg;
       var collection;
 
@@ -200,18 +193,24 @@
 
               if (a.amount) {
                 for (var i = 0; i < a.amount; i++) {
-                  collection.push(new Asset(_game, b, assetImg));
+                  asset = new Asset(_game, b, assetImg);
+                  collection.push(asset);
+                  _game.allAssets.push(asset);
                 }
               }
 
               else {
-                collection.push(new Asset(_game, b, assetImg));
+                asset = new Asset(_game, b, assetImg);
+                collection.push(asset);
+                _game.allAssets.push(asset);
               }
 
             }
 
             else if (b.name) {
-              _game.assets[b.name] = new Asset(_game, b, assetImg);
+              asset = new Asset(_game, b, assetImg);
+              _game.assets[b.name] = asset;
+              _game.allAssets.push(asset);
             }
 
             _game.loadedAssets = _game.loadedAssets + 1;
@@ -246,12 +245,13 @@
       this.paused = false;
     },
 
-    render: function () {
+    loop: function () {
 
       if (this.paused) { return; }
 
       this.clearCanvas();
-      this.inLoop();
+      this.update();
+      this.draw();
 
     },
 
@@ -313,22 +313,33 @@
 
     },
 
-    inLoop: function (callback) {
+    draw: function () {
 
-      this.inLoopCallback = this.inLoopCallback || callback;
+      if (this.onDraw) {
+        this.onDraw.call(this);
+      }
 
-      if (!callback) {
-        this.inLoopCallback.call(this);
+      this.allAssets.forEach(function(asset) {
+        _game.game.ctx.drawImage(asset.el, asset.x, asset.y);
+      });
+
+    },
+
+    update: function () {
+
+      if (this.onUpdate) {
+        this.onUpdate.call(this);
       }
 
     },
 
     clearCanvas: function() {
 
-      this.background.ctx.clearRect(0, 0, this.width, this.height);
       this.game.ctx.clearRect(0, 0, this.width, this.height);
 
-    }
+    },
+
+
 
   };
 

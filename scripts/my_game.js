@@ -26,16 +26,7 @@ window.addEventListener('load', function() {
     window.flappyDev = new FlappyEngine(container, settings);
 
     // Load some assets
-    flappyDev.loadAssets(
-            {
-                collectionName: 'pillars',
-                assets: [
-                    {src:'/assets/pillar.png', offset: {x: 700, y: 200}}
-                ],
-                amount: 20
-            }
-        );
-
+    // Last asset goes on the top layer
     flappyDev.loadAssets(
             {
                 collectionName: 'background',
@@ -48,13 +39,21 @@ window.addEventListener('load', function() {
 
     flappyDev.loadAssets(
             {
+                collectionName: 'pillars',
+                assets: [
+                    {src:'/assets/pillar.png', offset: {x: 700, y: 200}}
+                ],
+                amount: 20
+            }
+        );
+
+    flappyDev.loadAssets(
+            {
                 assets: [
                     {name: 'character', src:'/assets/character.png', offset: {x: 140, y: 200}}
                 ]
             }
         );
-
-
 
     // The games load event
     // Here we can do some further work
@@ -67,10 +66,12 @@ window.addEventListener('load', function() {
         // set the dynamic offset
         flappyDev.assets.background[1].x = 500;
 
+        // Now we can start the game!
+        flappyDev.start();
+
     });
 
-    // Now we can start the game!
-    flappyDev.start();
+
 
     // Flappy container click event
     // 'this' will reference to the new FlappyDev instance
@@ -82,14 +83,38 @@ window.addEventListener('load', function() {
 
         // GameSate returns states for 'on', 'paused', 'level', 'idle', etc.
         if (this.getGameState().on) {
-            this.assets.character.rise(4.5);
+            this.assets.character.rise(4);
         }
 
     });
 
-    // Hook into the game loop
+    document.addEventListener('keyup', function (e) {
+
+        if (e.which === 32) {
+
+            e.preventDefault();
+
+            if (flappyDev.getGameState().idle) {
+                flappyDev.play();
+            }
+
+            // GameSate returns states for 'on', 'paused', 'level', 'idle', etc.
+            if (flappyDev.getGameState().on) {
+                flappyDev.assets.character.rise(4.5);
+            }
+
+        }
+
+    });
+
+    // CTX Draw hook into the game loop
     // 'this' will reference to the new FlappyDev instance
-    flappyDev.inLoop(function () {
+    flappyDev.onDraw = function () {
+
+    };
+
+    // Update Assets, position etc.
+    flappyDev.onUpdate = function () {
 
         animateBackground();
 
@@ -99,19 +124,18 @@ window.addEventListener('load', function() {
         }
 
         animateCharacter();
-        animatePillar();
+        animatePillars();
 
         isOutOfBounds();
         isCollision();
 
-    });
+    };
 
-    function animatePillar () {
+    function animatePillars () {
 
         flappyDev.assets.pillars.forEach(function (pillar) {
 
             pillar.move(2).left();
-            flappyDev.game.ctx.drawImage(pillar.el, pillar.x, pillar.y);
 
             if (pillar.hasPassed(0)) {
                 pillar.x = 600;
@@ -129,23 +153,22 @@ window.addEventListener('load', function() {
 
     function isCollision () {
 
-
         flappyDev.assets.pillars.forEach(function (p) {
             if (flappyDev.assets.character.isCollision(p.x, p.y, p.w, p.h)) {
                 flappyDev.reset();
             }
         });
+
     }
 
     function animateBackground () {
 
         flappyDev.assets.background.forEach(function (background) {
 
-            background.move(0.6).left();
-            flappyDev.background.ctx.drawImage(background.el, background.x, background.y);
+            background.move(0.4).left();
 
             if (background.hasPassed(0)) {
-                background.x = background.w -2;
+                background.x = background.w;
             }
 
         });
@@ -153,13 +176,11 @@ window.addEventListener('load', function() {
     }
 
     function animateCharacter () {
-        flappyDev.game.ctx.drawImage(flappyDev.assets.character.el, flappyDev.assets.character.x, flappyDev.assets.character.y);
         flappyDev.assets.character.fall();
     }
 
     // Some custom fuctions
     function wobbleCharacter () {
-        flappyDev.game.ctx.drawImage(flappyDev.assets.character.el, flappyDev.assets.character.x, flappyDev.assets.character.y);
 
         flappyDev.assets.character.callback(function () {
 
