@@ -32,8 +32,8 @@ window.addEventListener('load', function() {
                 collectionName: 'background',
                 assets: [
                     {src:'/assets/background.png'},
-                ],
-                amount: 2
+                    {src:'/assets/background.png', offset: {x: 500}}
+                ]
             }
         );
 
@@ -41,9 +41,9 @@ window.addEventListener('load', function() {
             {
                 collectionName: 'pillars',
                 assets: [
-                    {src:'/assets/pillar.png', offset: {x: 700, y: 200}}
+                    {src:'/assets/pillar.png', offset: {x: 700}}
                 ],
-                amount: 20
+                duplicates: 20
             }
         );
 
@@ -55,16 +55,21 @@ window.addEventListener('load', function() {
             }
         );
 
+    flappyDev.loadAssets(
+            {
+                collectionName: 'foreground',
+                assets: [
+                    {src:'/assets/foreground.png', offset: {x: 0, y: 400}},
+                    {src:'/assets/foreground.png', offset: {x: 500, y: 400}}
+                ]
+            }
+        );
+
     // The games load event
     // Here we can do some further work
     // that needs to be done once
     // assets are loaded etc.
     flappyDev.onLoad(function () {
-
-        // set the static offset
-        flappyDev.assets.background[1].offsetX = 500;
-        // set the dynamic offset
-        flappyDev.assets.background[1].x = 500;
 
         // Now we can start the game!
         flappyDev.start();
@@ -107,6 +112,10 @@ window.addEventListener('load', function() {
 
     });
 
+    flappyDev.onPlay = function () {
+        layoutPillars(true);
+    };
+
     // CTX Draw hook into the game loop
     // 'this' will reference to the new FlappyDev instance
     flappyDev.onDraw = function () {
@@ -117,6 +126,7 @@ window.addEventListener('load', function() {
     flappyDev.onUpdate = function () {
 
         animateBackground();
+        animateForeground();
 
         if (this.idle) {
             wobbleCharacter();
@@ -131,14 +141,79 @@ window.addEventListener('load', function() {
 
     };
 
+    function layoutPillars (first) {
+
+        if (first || flappyDev.cache.pillarIteration === 0) {
+            flappyDev.cache.pillarIteration = flappyDev.assets.pillars.length;
+        }
+
+        var xOffset = first ? 700 : 500;
+        var pairs = [];
+        var pair = [];
+        var positionY;
+
+        flappyDev.assets.pillars.forEach(function (pillar, i) {
+
+
+            if (flappyDev.cache.pillarIteration === flappyDev.assets.pillars.length) {
+
+                pillar.isHidden = false;
+                pair.push(pillar);
+
+
+                if (i % 2 === 1) {
+
+                    positionY = Math.random() * (400 - 200) + 200;
+
+
+                    pair[0].y = positionY - 400 - 120;
+                    pair[1].y = positionY;
+                    pair[0].offsetY = positionY - 400 - 120;
+                    pair[1].offsetY = positionY;
+                    pair[0].x = xOffset;
+                    pair[1].x = xOffset;
+                    pair[0].offsetX = xOffset;
+                    pair[1].offsetX = xOffset;
+
+                    pair = [];
+                    xOffset = xOffset + 240;
+                }
+
+            }
+
+
+
+        });
+
+        flappyDev.cache.pillarIteration = flappyDev.cache.pillarIteration - 1;
+
+    }
+
     function animatePillars () {
 
         flappyDev.assets.pillars.forEach(function (pillar) {
 
-            pillar.move(2).left();
+            if (!pillar.isHidden) {
+                pillar.move(2).left();
+            }
 
-            if (pillar.hasPassed(0)) {
-                pillar.x = 600;
+            if (pillar.hasPassed(0) && !pillar.isHidden) {
+                layoutPillars();
+                pillar.isHidden = true;
+            }
+
+        });
+
+    }
+
+    function animateForeground () {
+
+        flappyDev.assets.foreground.forEach(function (foreground) {
+
+            foreground.move(2).left();
+
+            if (foreground.hasPassed(0)) {
+                foreground.x = foreground.w - 3;
             }
 
         });
@@ -146,9 +221,11 @@ window.addEventListener('load', function() {
     }
 
     function isOutOfBounds () {
+
         if (flappyDev.assets.character.isOutOfBounds(flappyDev.width, flappyDev.height)) {
             flappyDev.reset();
         }
+
     }
 
     function isCollision () {
@@ -168,7 +245,7 @@ window.addEventListener('load', function() {
             background.move(0.4).left();
 
             if (background.hasPassed(0)) {
-                background.x = background.w;
+                background.x = background.w - 3;
             }
 
         });
@@ -176,7 +253,9 @@ window.addEventListener('load', function() {
     }
 
     function animateCharacter () {
+
         flappyDev.assets.character.fall();
+
     }
 
     // Some custom fuctions

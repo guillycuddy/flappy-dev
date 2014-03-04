@@ -75,14 +75,14 @@
     },
 
     isOutOfBounds: function (w, h) {
+      // hardcoded val '50' for earlier bottom bounds
       return  (this.x <= 0) || (this.w + this.x >= w) ||
-              (this.y <= 0) || (this.h + this.y >= h);
+              (this.y <= 0) || (this.h + this.y >= h - 55);
     },
 
     isInView: function () {
-      // hardcoded canvas size variables
-      return  (this.x < 500) && (this.x + this.w > 0) &&
-              (this.y < 500) && (this.y + this.h > 0)
+      return  (this.x < this.contextW) && (this.x + this.w > 0) &&
+              (this.y < this.contextH) && (this.y + this.h > 0)
     },
 
     fall: function () {
@@ -148,6 +148,7 @@
     this.loadedAssets = 0;
     this.assetsLength = 0;
     this.allAssets = [];
+    this.cache = {};
 
     this.container.appendChild(this.game.canvas);
 
@@ -191,8 +192,16 @@
 
             if (collection) {
 
-              if (a.amount) {
-                for (var i = 0; i < a.amount; i++) {
+              if (a.duplicates) {
+                for (var i = 0; i < a.duplicates; i++) {
+                  asset = new Asset(_game, b, assetImg);
+                  collection.push(asset);
+                  _game.allAssets.push(asset);
+                }
+              }
+
+              else if (a.length > 1) {
+                for (var i = 0; i < a.length; i++) {
                   asset = new Asset(_game, b, assetImg);
                   collection.push(asset);
                   _game.allAssets.push(asset);
@@ -243,13 +252,17 @@
       this.idle = false;
       this.on = true;
       this.paused = false;
+
+      if (this.onPlay) {
+        this.onPlay.call(this);
+      }
+
     },
 
     loop: function () {
 
       if (this.paused) { return; }
 
-      this.clearCanvas();
       this.update();
       this.draw();
 
@@ -314,6 +327,8 @@
     },
 
     draw: function () {
+
+      this.clearCanvas();
 
       if (this.onDraw) {
         this.onDraw.call(this);
