@@ -50,7 +50,15 @@ window.addEventListener('load', function() {
     flappyDev.loadAssets(
             {
                 assets: [
-                    {name: 'character', src:'/assets/character.png', offset: {x: 140, y: 200}}
+                    {
+                        name: 'character',
+                        src:'/assets/ninja-sprite.png',
+                        sprite: {
+                            ticksPerFrame: 6,
+                            numberOfFrames: 3
+                        },
+                        offset: {x: 140, y: 200}
+                    }
                 ]
             }
         );
@@ -120,6 +128,31 @@ window.addEventListener('load', function() {
     // 'this' will reference to the new FlappyDev instance
     flappyDev.onDraw = function () {
 
+        flappyDev.allAssets.forEach(function(asset) {
+
+            if (!asset.isSprite) {
+
+                flappyDev.game.ctx.drawImage(asset.el, asset.x, asset.y);
+
+            } else {
+                asset.updateSprite();
+
+                flappyDev.game.ctx.drawImage(
+                    asset.el,
+                    asset.frameIndex * asset.w,
+                    0,
+                    asset.w,
+                    asset.h,
+                    asset.x,
+                    asset.y,
+                    asset.w,
+                    asset.h
+                );
+
+            }
+
+        });
+
     };
 
     // Update Assets, position etc.
@@ -176,7 +209,7 @@ window.addEventListener('load', function() {
                     pair[1].offsetX = xOffset;
 
                     pair = [];
-                    xOffset = xOffset + 240;
+                    xOffset = xOffset + 250;
                 }
 
             }

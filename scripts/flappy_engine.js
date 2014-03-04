@@ -45,16 +45,21 @@
 
   var Asset = function (context, asset, img) {
     this.el = img;
+    this.isSprite = !!asset.sprite;
     this.offsetX = (asset.offset && asset.offset.x) ? asset.offset.x : 0;
     this.offsetY = (asset.offset && asset.offset.y) ? asset.offset.y : 0;
+    this.ticksPerFrame = (asset.sprite && asset.sprite.ticksPerFrame) ? asset.sprite.ticksPerFrame : 0;
+    this.numberOfFrames = (asset.sprite && asset.sprite.numberOfFrames) ? asset.sprite.numberOfFrames : 1;
     this.scopeGravityY = context.gravityY;
     this.velocityY = 0;
     this.velocityX = 0;
-    this.w = img.width;
+    this.w = img.width / this.numberOfFrames;
     this.h = img.height;
     this.x = 0 + this.offsetX;
     this.y = 0 + this.offsetY;
     this.inView = false;
+    this.tickCount = 0;
+    this.frameIndex = 0;
 
     this.context = context;
     this.contextW = context.width
@@ -113,6 +118,25 @@
         down:   function () { _this.y = _this.y + speed || - 0.5; }
       };
 
+    },
+
+    updateSprite: function () {
+
+      this.tickCount += 1;
+
+      if (this.tickCount > this.ticksPerFrame) {
+
+        this.tickCount = 0;
+
+        // If the current frame index is in range
+        if (this.frameIndex < this.numberOfFrames - 1) {
+            // Go to the next frame
+            this.frameIndex += 1;
+        } else {
+            this.frameIndex = 0;
+        }
+
+      }
     }
 
   };
@@ -333,10 +357,6 @@
       if (this.onDraw) {
         this.onDraw.call(this);
       }
-
-      this.allAssets.forEach(function(asset) {
-        _game.game.ctx.drawImage(asset.el, asset.x, asset.y);
-      });
 
     },
 
