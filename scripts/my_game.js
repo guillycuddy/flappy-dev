@@ -94,6 +94,10 @@ window.addEventListener('load', function() {
             this.play();
         }
 
+        if (this.getGameState().paused) {
+            this.reset();
+        }
+
         // GameSate returns states for 'on', 'paused', 'level', 'idle', etc.
         if (this.getGameState().on) {
             this.assets.character.rise(4);
@@ -255,8 +259,8 @@ window.addEventListener('load', function() {
 
     function isOutOfBounds () {
 
-        if (flappyDev.assets.character.isOutOfBounds(flappyDev.width, flappyDev.height)) {
-            flappyDev.reset();
+        if (flappyDev.assets.character.isOutOfBounds(flappyDev.width, flappyDev.height - 55)) {
+            flappyDev.paused = true;
         }
 
     }
@@ -265,7 +269,7 @@ window.addEventListener('load', function() {
 
         flappyDev.assets.pillars.forEach(function (p) {
             if (flappyDev.assets.character.isCollision(p.x, p.y, p.w, p.h)) {
-                flappyDev.reset();
+                flappyDev.paused = true;
             }
         });
 

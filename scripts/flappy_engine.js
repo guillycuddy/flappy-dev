@@ -80,9 +80,8 @@
     },
 
     isOutOfBounds: function (w, h) {
-      // hardcoded val '50' for earlier bottom bounds
       return  (this.x <= 0) || (this.w + this.x >= w) ||
-              (this.y <= 0) || (this.h + this.y >= h - 55);
+              (this.y <= 0) || (this.h + this.y >= h);
     },
 
     isInView: function () {
@@ -128,9 +127,7 @@
 
         this.tickCount = 0;
 
-        // If the current frame index is in range
         if (this.frameIndex < this.numberOfFrames - 1) {
-            // Go to the next frame
             this.frameIndex += 1;
         } else {
             this.frameIndex = 0;
@@ -299,25 +296,9 @@
       this.level = 0;
       this.idle = true;
 
-      for (var key in this.assets) {
-
-        if (this.assets.hasOwnProperty(key)) {
-
-          if (this.assets[key].length) {
-
-            this.assets[key].forEach(function (asset) {
-              asset.reset();
-            });
-
-          }
-
-          else {
-            this.assets[key].reset();
-          }
-
-        }
-
-      }
+      this.allAssets.forEach(function (asset) {
+        asset.reset();
+      });
 
     },
 
