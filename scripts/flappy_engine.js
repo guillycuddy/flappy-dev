@@ -48,12 +48,12 @@
     this.isSprite = !!asset.sprite;
     this.offsetX = (asset.offset && asset.offset.x) ? asset.offset.x : 0;
     this.offsetY = (asset.offset && asset.offset.y) ? asset.offset.y : 0;
-    this.ticksPerFrame = (asset.sprite && asset.sprite.ticksPerFrame) ? asset.sprite.ticksPerFrame : 0;
-    this.numberOfFrames = (asset.sprite && asset.sprite.numberOfFrames) ? asset.sprite.numberOfFrames : 1;
+    this.ticks = (asset.sprite && asset.sprite.ticks) ? asset.sprite.ticks : 0;
+    this.frames = (asset.sprite && asset.sprite.frames) ? asset.sprite.frames : 1;
     this.scopeGravityY = context.gravityY;
     this.velocityY = 0;
     this.velocityX = 0;
-    this.w = img.width / this.numberOfFrames;
+    this.w = img.width / this.frames;
     this.h = img.height;
     this.x = 0 + this.offsetX;
     this.y = 0 + this.offsetY;
@@ -103,7 +103,11 @@
     },
 
     hasPassed: function (coord) {
-      return  (this.x + this.w < coord);
+      if (coord || coord === 0) {
+        return  (this.x + this.w < coord);
+      } else {
+        return this.x;
+      }
     },
 
     move: function (speed) {
@@ -123,17 +127,42 @@
 
       this.tickCount += 1;
 
-      if (this.tickCount > this.ticksPerFrame) {
+      if (this.tickCount > this.frames) {
 
         this.tickCount = 0;
 
-        if (this.frameIndex < this.numberOfFrames - 1) {
+        if (this.frameIndex < this.frames - 1) {
             this.frameIndex += 1;
         } else {
             this.frameIndex = 0;
         }
 
       }
+
+    },
+
+    draw: function () {
+
+      if (!this.isSprite) {
+
+          this.context.game.ctx.drawImage(this.el, this.x, this.y);
+
+      } else {
+
+          this.context.game.ctx.drawImage(
+              this.el,
+              this.frameIndex * this.w,
+              0,
+              this.w,
+              this.h,
+              this.x,
+              this.y,
+              this.w,
+              this.h
+          );
+
+      }
+
     }
 
   };
@@ -161,6 +190,7 @@
     this.game.canvas.width = this.width;
     this.game.canvas.height = this.height;
     this.paused = false;
+    this.ended = false;
     this.idle = true;
     this.on = false;
     this.level = 0;
@@ -169,7 +199,37 @@
     this.loadedAssets = 0;
     this.assetsLength = 0;
     this.allAssets = [];
-    this.cache = {};
+    this._ = {};
+
+    // this.assets.collection = function(name, callback) {
+    //   var collection = this[name];
+
+    //   if (collection) {
+    //     collection.forEach(function (asset) {
+    //       callback.call(asset);
+    //     });
+    //   }
+
+    // };
+
+    this.assets.collection = function(name) {
+
+      var collection = this[name];
+
+      if (collection) {
+
+        return {
+          draw: function () {
+            collection.forEach(function (asset) {
+              asset.draw();
+            });
+          }
+        }
+
+      }
+
+    };
+
 
     this.container.appendChild(this.game.canvas);
 
@@ -295,6 +355,7 @@
       this.on = false;
       this.level = 0;
       this.idle = true;
+      this.ended = false;
 
       this.allAssets.forEach(function (asset) {
         asset.reset();
@@ -314,17 +375,20 @@
         paused: this.paused,
         on: this.on,
         level: this.level,
-        idle: this.idle
+        idle: this.idle,
+        ended: this.ended
       }
 
     },
 
     clicksOnContainer: function (callback) {
 
-      this.container.addEventListener('click', function () {
+      this.container.addEventListener('click', function (e) {
+
+        e.preventDefault();
 
         if (typeof callback === 'function') {
-          callback.call(_game);
+          callback.call(_game, e);
         }
 
       }, false);
@@ -353,6 +417,11 @@
 
       this.game.ctx.clearRect(0, 0, this.width, this.height);
 
+    },
+
+    isOnTarget: function (asset, x, y) {
+      return  (asset.x <= x) && (asset.x + asset.w >= x) &&
+        (asset.y <= y) && (asset.y + asset.h >= y);
     },
 
 
