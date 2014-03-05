@@ -363,19 +363,19 @@ window.addEventListener('load', function() {
 
     function endGame () {
 
-        flappyDev.ended = true;
 
         if (window.localStorage.getItem('flappyHiScore')) {
 
             if (window.localStorage.getItem('flappyHiScore') < score) {
                 window.localStorage.setItem('flappyHiScore', score);
-                hiScoreContainer.innerHTML = score;
+                hiscore = score;
             }
 
         } else {
             window.localStorage.setItem('flappyHiScore', score);
-            hiScoreContainer.innerHTML = score;
         }
+
+        flappyDev.ended = true;
 
     }
 
