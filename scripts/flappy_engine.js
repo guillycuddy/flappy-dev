@@ -369,15 +369,9 @@
 
     },
 
-    getGameState: function () {
+    gameState: {
 
-      return {
-        paused: this.paused,
-        on: this.on,
-        level: this.level,
-        idle: this.idle,
-        ended: this.ended
-      }
+      is: function (state) { return _game[state]; }
 
     },
 
@@ -420,9 +414,33 @@
     },
 
     isOnTarget: function (asset, x, y) {
+
       return  (asset.x <= x) && (asset.x + asset.w >= x) &&
         (asset.y <= y) && (asset.y + asset.h >= y);
+
     },
+
+    loadAudio: function (audio) {
+
+      this.samples = jsfxlib.createWaves(audio);
+
+    },
+
+    audio: function (sample) {
+
+      return {
+        volume: function (vol) {
+          _game.samples[sample].volume = vol;
+          return this;
+        },
+        play: function () {
+          _game.samples[sample].currentTime = 0;
+          _game.samples[sample].play();
+          return this;
+        }
+      }
+
+    }
 
 
 

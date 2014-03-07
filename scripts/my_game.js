@@ -76,6 +76,24 @@ window.addEventListener('load', function() {
             }
         );
 
+    flappyDev.loadAudio({
+        jump: ["square",2.0000,0.0730,0.0000,0.0960,0.2820,0.1660,161.0000,485.0000,2400.0000,0.3120,0.1920,0.1640,0.0100,-0.0894,0.0280,-0.7080,0.0000,0.5000,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000,0.0000,0.0000],
+        explosion: ["saw",2.0000,0.1670,0.0000,0.2920,0.0000,0.4100,20.0000,604.0000,2400.0000,0.2200,0.0000,0.4580,14.5990,0.0003,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000,0.0000,0.0000],
+        touch: ["noise",0.0000,0.4000,0.0000,0.0940,0.0000,0.1640,20.0000,834.0000,2400.0000,-0.5100,0.0000,0.0000,0.0100,0.0003,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000,0.2320,0.0000],
+        hit: ["saw",0.0000,0.4000,0.0000,0.0940,0.0000,0.2060,20.0000,441.0000,2400.0000,-0.5200,0.0000,0.0000,0.0100,0.0003,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000,0.0000,0.0000],
+        coin: ["square",2.0000,0.1670,0.0000,0.0860,0.3300,0.3940,20.0000,694.0000,2400.0000,0.0000,0.0000,0.0000,0.0100,0.0003,0.0000,0.2800,0.1330,0.0000,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000,0.0000,0.0000]
+    });
+
+
+
+
+
+  // document.addEventListener('click', function () {
+  //   samples.test.currentTime = 0;
+  //   samples.test.play();
+  // });
+
+
     // The games load event
     // Here we can do some further work
     // that needs to be done once
@@ -93,42 +111,53 @@ window.addEventListener('load', function() {
     // 'this' will reference to the new FlappyDev instance
     flappyDev.clicksOnContainer(function (e) {
 
-        if (this.getGameState().idle) {
+        if (this.gameState.is('idle')) {
             this.play();
         }
 
-        if (this.getGameState().ended) {
+        if (this.gameState.is('ended')) {
 
-            if (this.isOnTarget({x: 125, y: 250, w: 250, h: 60}, e.offsetX, e.offsetY)) {
+
+            var x = e.hasOwnProperty('offsetX') ? e.offsetX : e.layerX;
+            var y = e.hasOwnProperty('offsetY') ? e.offsetY : e.layerY;
+
+            if (this.isOnTarget({x: 125, y: 250, w: 250, h: 60}, x, y)) {
+
                 this.reset();
             }
         }
 
         // GameSate returns states for 'on', 'paused', 'level', 'idle', etc.
-        if (this.getGameState().on) {
+        if (this.gameState.is('on')) {
             this.assets.character.rise(4);
         }
 
-    });
+        if (this.gameState.is('on') && !this.gameState.is('ended')) {
 
-    document.addEventListener('keydown', function (e) {
-
-        if (e.which === 32) {
-
-            e.preventDefault();
-
-            if (flappyDev.getGameState().idle) {
-                flappyDev.play();
-            }
-
-            // GameSate returns states for 'on', 'paused', 'level', 'idle', etc.
-            if (flappyDev.getGameState().on) {
-                flappyDev.assets.character.rise(4.5);
-            }
-
+            // flappyDev.audio('name')
+            // chaining methods: play and volume (0.0-1.0);
+            this.audio('jump').play().volume(0.4);
         }
 
     });
+
+    // document.addEventListener('keydown', function (e) {
+
+    //     if (e.which === 32) {
+
+    //         e.preventDefault();
+
+    //         if (flappyDev.gameState().is('idle')) {
+    //             flappyDev.play();
+    //         }
+
+    //         if (flappyDev.gameState().is('on')) {
+    //             flappyDev.assets.character.rise(4.5);
+    //         }
+
+    //     }
+
+    // });
 
     flappyDev.onPlay = function () {
         layoutPillars(true);
@@ -248,6 +277,7 @@ window.addEventListener('load', function() {
                 score += 0.5;
 
                 pillar.hasScored = true;
+                flappyDev.audio('coin').play().volume(0.08);
             }
 
         });
@@ -376,6 +406,7 @@ window.addEventListener('load', function() {
         }
 
         flappyDev.ended = true;
+        flappyDev.audio('explosion').play().volume(0.2);
 
     }
 
