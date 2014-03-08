@@ -42,6 +42,16 @@ window.addEventListener('load', function() {
 
     flappyDev.loadAssets(
             {
+                collectionName: 'clouds',
+                assets: [
+                    {src:'/assets/background-clouds.png'},
+                    {src:'/assets/background-clouds.png', offset: {x: 500}}
+                ]
+            }
+        );
+
+    flappyDev.loadAssets(
+            {
                 collectionName: 'pillars',
                 assets: [
                     {src:'/assets/pillar.png', offset: {x: 700}}
@@ -136,7 +146,7 @@ window.addEventListener('load', function() {
 
             // flappyDev.audio('name')
             // chaining methods: play and volume (0.0-1.0);
-            this.audio('jump').play().volume(0.4);
+            this.audio('jump').play().volume(0.3);
         }
 
     });
@@ -170,12 +180,17 @@ window.addEventListener('load', function() {
     flappyDev.onDraw = function () {
 
         // Draw a collection
+        this.assets.collection('clouds').draw();
         this.assets.collection('background').draw();
         this.assets.collection('foreground').draw();
         this.assets.collection('pillars').draw();
 
         // Draw individual enteties
         this.assets.character.draw();
+
+        if (this.idle) {
+            printLogo();
+        }
 
         if (this.ended) {
             printEndScore();
@@ -293,6 +308,17 @@ window.addEventListener('load', function() {
 
         flappyDev.game.ctx.fillText(score, 25, 40);
 
+    }
+
+    function printLogo () {
+        flappyDev.game.ctx.fillStyle = 'black';
+        flappyDev.game.ctx.font = 'bold 30px press_start_2pregular';
+        flappyDev.game.ctx.textBaseline = 'bottom';
+        flappyDev.game.ctx.fillText('FLAPPY NINJA', 60, 325);
+
+        flappyDev.game.ctx.fillStyle = 'white';
+
+        flappyDev.game.ctx.fillText('FLAPPY NINJA', 60, 320);
     }
 
     function printEndScore () {
