@@ -5,7 +5,7 @@
 // Thanks:  Johan G for the gravity
 
 
-(function (win, doc, undefined) {
+(function (win, doc, jsfxlib, undefined) {
   'use strict';
 
   win.requestAnimFrame = (function () {
@@ -21,6 +21,7 @@
   })();
 
   var _game;
+  var jsfxlib = jsfxlib || undefined;
   var evt = doc.createEvent('Event');
   evt.initEvent('gameIsOn', true, true);
 
@@ -422,22 +423,37 @@
 
     loadAudio: function (audio) {
 
-      this.samples = jsfxlib.createWaves(audio);
+      if (jsfxlib) {
+
+        this.samples = jsfxlib.createWaves(audio);
+
+      }
 
     },
 
     audio: function (sample) {
 
-      return {
-        volume: function (vol) {
-          _game.samples[sample].volume = vol;
-          return this;
-        },
-        play: function () {
-          _game.samples[sample].currentTime = 0;
-          _game.samples[sample].play();
-          return this;
-        }
+      if (jsfxlib) {
+
+        return {
+          volume: function (vol) {
+            _game.samples[sample].volume = vol;
+            return this;
+          },
+          play: function () {
+            _game.samples[sample].currentTime = 0;
+            _game.samples[sample].play();
+            return this;
+          }
+        };
+
+      } else {
+
+        return {
+          volume: function () { return this; },
+          play: function () { return this; }
+        };
+
       }
 
     }
@@ -446,7 +462,7 @@
 
   };
 
-})(window, document);
+})(window, document, jsfxlib);
 
 
 
