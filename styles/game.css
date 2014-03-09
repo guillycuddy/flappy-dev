@@ -3,6 +3,7 @@ body {
     width: 500px;
     margin: 20px auto;
     background: #2C2339;
+
 }
 
 @font-face {
@@ -22,4 +23,11 @@ body {
     height: 500px;
     background: #4A365B;
     -ms-touch-action: none;
+
+    background-color: #4a365b;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#4a365b), to(#785795));
+  background-image: -webkit-linear-gradient(top, #4a365b, #785795);
+  background-image:    -moz-linear-gradient(top, #4a365b, #785795);
+  background-image:      -o-linear-gradient(top, #4a365b, #785795);
+  background-image:         linear-gradient(to bottom, #4a365b, #785795);
 }

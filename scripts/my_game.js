@@ -197,6 +197,7 @@ window.addEventListener('load', function() {
             return;
         }
 
+        animateClouds();
         animateBackground();
         animateForeground();
 
@@ -306,6 +307,9 @@ window.addEventListener('load', function() {
         flappyDev.game.ctx.fillStyle = 'white';
 
         flappyDev.game.ctx.fillText('FLAPPY NINJA', 60, 320);
+
+        flappyDev.game.ctx.font = 'bold 14px press_start_2pregular';
+        flappyDev.game.ctx.fillText('Tap to start', 150, 360);
     }
 
     function printEndScore () {
@@ -374,6 +378,20 @@ window.addEventListener('load', function() {
 
             if (background.hasPassed(0)) {
                 background.x = background.w - 3;
+            }
+
+        });
+
+    }
+
+    function animateClouds () {
+
+        flappyDev.assets.clouds.forEach(function (cloud) {
+
+            cloud.move(0.2).left();
+
+            if (cloud.hasPassed(0)) {
+                cloud.x = cloud.w - 3;
             }
 
         });
