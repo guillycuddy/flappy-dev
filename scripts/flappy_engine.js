@@ -85,6 +85,22 @@
               (this.y <= 0) || (this.h + this.y >= h);
     },
 
+    isOutOfBoundsCheck: function (w, h) {
+      var xCheck = (this.x <= 0) || (this.w + this.x >= w);
+      var yCheck = (this.y <= 0) || (this.h + this.y >= h);
+
+      if (xCheck) {
+        return {x: this.x};
+      }
+
+      if (yCheck) {
+        return {y: this.y};
+      }
+
+      return {x: null, y: null};
+
+    },
+
     isInView: function () {
       return  (this.x < this.contextW) && (this.x + this.w > 0) &&
               (this.y < this.contextH) && (this.y + this.h > 0)

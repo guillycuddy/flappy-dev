@@ -86,6 +86,7 @@ window.addEventListener('load', function() {
             }
         );
 
+    // Sound via http://www.egonelbre.com/js/jsfx/
     flappyDev.loadAudio({
         jump: ["square",2.0000,0.0730,0.0000,0.0960,0.2820,0.1660,161.0000,485.0000,2400.0000,0.3120,0.1920,0.1640,0.0100,-0.0894,0.0280,-0.7080,0.0000,0.5000,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000,0.0000,0.0000],
         explosion: ["saw",2.0000,0.1670,0.0000,0.2920,0.0000,0.4100,20.0000,604.0000,2400.0000,0.2200,0.0000,0.4580,14.5990,0.0003,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000,0.0000,0.0000],
@@ -96,16 +97,6 @@ window.addEventListener('load', function() {
         start: ["square",0.0000,0.4000,0.0000,0.1680,0.0000,0.1580,20.0000,472.0000,2400.0000,0.0000,0.0000,0.0000,0.0100,0.0003,0.0000,0.0000,0.0000,0.2645,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000,0.1000,0.0000]
     });
 
-
-
-
-
-  // document.addEventListener('click', function () {
-  //   samples.test.currentTime = 0;
-  //   samples.test.play();
-  // });
-
-
     // The games load event
     // Here we can do some further work
     // that needs to be done once
@@ -115,9 +106,9 @@ window.addEventListener('load', function() {
         // Now we can start the game!
         flappyDev.start();
 
+
+
     });
-
-
 
     // Flappy container click event
     // 'this' will reference to the new FlappyDev instance
@@ -152,13 +143,10 @@ window.addEventListener('load', function() {
             this.audio('jump').play().volume(0.3);
         }
 
-
-
     });
 
     flappyDev.onPlay = function () {
         layoutPillars(true);
-
         score = 0;
     };
 
@@ -186,6 +174,7 @@ window.addEventListener('load', function() {
 
         if (!this.ended) {
             printScore();
+            printHiscore();
         }
 
     };
@@ -244,9 +233,9 @@ window.addEventListener('load', function() {
 
                     positionY = Math.random() * (400 - 200) + 200;
 
-                    pair[0].y = positionY - 400 - 130;
+                    pair[0].y = positionY - 400 - 120;
                     pair[1].y = positionY;
-                    pair[0].offsetY = positionY - 400 - 130;
+                    pair[0].offsetY = positionY - 400 - 120;
                     pair[1].offsetY = positionY;
                     pair[0].x = xOffset;
                     pair[1].x = xOffset;
@@ -296,6 +285,18 @@ window.addEventListener('load', function() {
 
         flappyDev.game.ctx.fillText(score, 25, 40);
 
+    }
+
+    function printHiscore () {
+        flappyDev.game.ctx.save()
+        flappyDev.game.ctx.fillStyle = 'rgba(255,255,255,.6)';
+        flappyDev.game.ctx.font = 'bold 14px press_start_2pregular';
+        flappyDev.game.ctx.textBaseline = 'bottom';
+        flappyDev.game.ctx.textAlign = 'right';
+
+
+        flappyDev.game.ctx.fillText('Best ' + hiscore, 475, 36);
+        flappyDev.game.ctx.restore();
     }
 
     function printLogo () {
@@ -354,8 +355,16 @@ window.addEventListener('load', function() {
 
     function isOutOfBounds () {
 
-        if (flappyDev.assets.character.isOutOfBounds(flappyDev.width, flappyDev.height - 55)) {
+        var yCheck = flappyDev.assets.character.isOutOfBoundsCheck(flappyDev.width, flappyDev.height - 55);
+
+        if (yCheck.y && yCheck.y < 10) {
+
+            flappyDev.assets.character.y = 0;
+
+        } else if (yCheck.y && yCheck.y > (flappyDev.height - 110)) {
+
             endGame();
+
         }
 
     }
