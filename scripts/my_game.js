@@ -34,8 +34,8 @@ window.addEventListener('load', function() {
             {
                 collectionName: 'background',
                 assets: [
-                    {src:'/assets/background.png'},
-                    {src:'/assets/background.png', offset: {x: 500}}
+                    {src:'./assets/background.png'},
+                    {src:'./assets/background.png', offset: {x: 500}}
                 ]
             }
         );
@@ -44,8 +44,8 @@ window.addEventListener('load', function() {
             {
                 collectionName: 'clouds',
                 assets: [
-                    {src:'/assets/background-clouds.png'},
-                    {src:'/assets/background-clouds.png', offset: {x: 500}}
+                    {src:'./assets/background-clouds.png'},
+                    {src:'./assets/background-clouds.png', offset: {x: 500}}
                 ]
             }
         );
@@ -54,7 +54,7 @@ window.addEventListener('load', function() {
             {
                 collectionName: 'pillars',
                 assets: [
-                    {src:'/assets/pillar.png', offset: {x: 700}}
+                    {src:'./assets/pillar.png', offset: {x: 700}}
                 ],
                 duplicates: 20
             }
@@ -80,8 +80,8 @@ window.addEventListener('load', function() {
             {
                 collectionName: 'foreground',
                 assets: [
-                    {src:'/assets/foreground.png', offset: {x: 0, y: 400}},
-                    {src:'/assets/foreground.png', offset: {x: 500, y: 400}}
+                    {src:'./assets/foreground.png', offset: {x: 0, y: 400}},
+                    {src:'./assets/foreground.png', offset: {x: 500, y: 400}}
                 ]
             }
         );
